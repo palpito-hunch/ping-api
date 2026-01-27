@@ -23,9 +23,12 @@ def ping(
     x_timezone: Annotated[str, Header(description="IANA timezone (e.g., America/New_York)")] = "UTC",
 ) -> PingResponse:
     """Return Pong with current datetime in the user's timezone."""
+    if not x_timezone:
+        x_timezone = "UTC"
+
     try:
         tz = ZoneInfo(x_timezone)
-    except ZoneInfoNotFoundError:
+    except (ZoneInfoNotFoundError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid timezone: '{x_timezone}'. Use IANA format (e.g., America/New_York, Europe/London).",
