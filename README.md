@@ -102,4 +102,14 @@ This project was created by Claude Code following these principles:
 
 ## Time to Create
 
-_To be updated after completion._
+**Total: 3 minutes 6 seconds**
+
+| Step | Description |
+|------|-------------|
+| Initial setup | Project structure, FastAPI app, /ping endpoint |
+| Documentation | README with rules and explanations |
+| Repository | Created public repo at palpito-hunch/ping-api |
+| Testing | 20 tests covering happy paths and edge cases |
+| Final push | All changes committed and pushed |
+
+*Generated entirely by Claude Code (claude-opus-4-5-20251101)*
