@@ -1,14 +1,15 @@
 # Ping API
 
-A simple FastAPI service with a `/ping` endpoint that returns the current datetime in the user's timezone.
+A FastAPI service with a `/ping` endpoint that returns the current datetime in the user's timezone and tracks view counts per user.
 
 ## What It Does
 
 - **Endpoint**: `GET /ping`
-- **Response**: HTTP 200 with `{"message": "Pong @ {datetime}"}`
+- **User Tracking**: Requires `X-User-Id` header to identify users
+- **View Counting**: Tracks how many times each user has called the endpoint
 - **Timezone**: Accepts `X-Timezone` header (IANA format like `America/New_York`)
-- **Default**: UTC if no timezone header provided
-- **Validation**: Returns HTTP 400 with helpful error for invalid timezones
+- **Atomic Updates**: Uses database-level upsert to prevent race conditions
+- **Database**: SQLite with SQLAlchemy ORM
 
 ## Setup
 
@@ -32,21 +33,40 @@ Server runs at http://localhost:8000
 ## Usage
 
 ```bash
-# Default (UTC)
-curl http://localhost:8000/ping
+# Basic request (requires X-User-Id)
+curl -H "X-User-Id: user-123" http://localhost:8000/ping
 
 # With timezone
-curl -H "X-Timezone: America/New_York" http://localhost:8000/ping
-curl -H "X-Timezone: Europe/London" http://localhost:8000/ping
-curl -H "X-Timezone: Asia/Tokyo" http://localhost:8000/ping
+curl -H "X-User-Id: user-123" -H "X-Timezone: America/New_York" http://localhost:8000/ping
+curl -H "X-User-Id: user-123" -H "X-Timezone: Europe/London" http://localhost:8000/ping
+curl -H "X-User-Id: user-123" -H "X-Timezone: Asia/Tokyo" http://localhost:8000/ping
 ```
 
 ## Response
 
 ```json
 {
-  "message": "Pong @ 2024-01-15 14:30:45 EST"
+  "message": "Pong @ 2024-01-15 14:30:45 EST",
+  "views": 5,
+  "updated_at": "2024-01-15 14:30:45 EST"
 }
+```
+
+## Headers
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `X-User-Id` | Yes | Unique identifier for the user |
+| `X-Timezone` | No | IANA timezone (defaults to UTC) |
+
+## Data Model
+
+```
+users
+├── id (string, primary key) - User identifier from X-User-Id header
+├── views (integer) - Number of times this user called /ping
+├── created_at (datetime) - When user was first seen
+└── updated_at (datetime) - Last time user called /ping
 ```
 
 ## Run Tests
@@ -55,6 +75,12 @@ curl -H "X-Timezone: Asia/Tokyo" http://localhost:8000/ping
 pip install pytest httpx
 pytest -v
 ```
+
+31 tests covering:
+- Basic endpoint functionality
+- View tracking and incrementing
+- Concurrent request handling (race conditions)
+- Timezone variants
 
 ## API Docs
 
