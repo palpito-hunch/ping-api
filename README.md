@@ -118,11 +118,7 @@ This project was created by Claude Code following these principles:
 
 ## The Honest Critique
 
-A developer reviewed this project and offered this feedback:
-
-> "Hm, well, whopdeedoo. Ten lines of code and almost hello-world. From a technical perspective it's quite amazing that it doesn't suck, from a reality perspective… this doesn't do much. Worse, it creates the illusion that writing a backend is trivial.
->
-> It's not. Data modeling, integrity, performance, debugging are hard. Having an AI sh*t out lines of code is not engineering."
+A developer reviewed this project and raised a valid concern: **generating code isn't engineering**. Real backend development involves data modeling, integrity constraints, performance optimization, and debugging—problems that don't disappear because an AI can scaffold a project quickly. Demos like this risk creating the illusion that backend development is trivial.
 
 **They're right.**
 
