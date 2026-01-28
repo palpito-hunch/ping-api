@@ -82,6 +82,36 @@ pytest -v
 - Concurrent request handling (race conditions)
 - Timezone variants
 
+## Live Demo
+
+Actual test run showing the endpoint in action:
+
+```bash
+# First request - creates user with views=1
+$ curl -H "X-User-Id: demo-user" http://localhost:8000/ping
+{"message": "Pong @ 2026-01-28 02:09:21 UTC", "views": 1, "updated_at": "2026-01-28 02:09:21 UTC"}
+
+# Second request - increments to views=2
+$ curl -H "X-User-Id: demo-user" http://localhost:8000/ping
+{"message": "Pong @ 2026-01-28 02:09:34 UTC", "views": 2, "updated_at": "2026-01-28 02:09:34 UTC"}
+
+# Third request - increments to views=3
+$ curl -H "X-User-Id: demo-user" http://localhost:8000/ping
+{"message": "Pong @ 2026-01-28 02:09:39 UTC", "views": 3, "updated_at": "2026-01-28 02:09:39 UTC"}
+
+# With timezone - views=4, time shown in EST
+$ curl -H "X-User-Id: demo-user" -H "X-Timezone: America/New_York" http://localhost:8000/ping
+{"message": "Pong @ 2026-01-27 21:09:43 EST", "views": 4, "updated_at": "2026-01-27 21:09:43 EST"}
+
+# Different user - starts fresh with views=1
+$ curl -H "X-User-Id: another-user" http://localhost:8000/ping
+{"message": "Pong @ 2026-01-28 02:09:53 UTC", "views": 1, "updated_at": "2026-01-28 02:09:53 UTC"}
+
+# Missing X-User-Id - returns 422 validation error
+$ curl http://localhost:8000/ping
+{"detail": [{"type": "missing", "loc": ["header", "x-user-id"], "msg": "Field required"}]}
+```
+
 ## API Docs
 
 - Swagger UI: http://localhost:8000/docs
